@@ -52,8 +52,13 @@ body {
 }
 
 .game-chat-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: #09090b; /* mesmo fundo do app */
   flex-shrink: 0;
 }
+
 
 .game-chat-messages {
   flex: 1;
@@ -110,4 +115,72 @@ body {
   bottom: 80px;
   right: 16px;
   z-index: 60;
+}
+
+/* =========================
+   MICROANIMAÇÕES — CHAT
+========================= */
+
+@keyframes bubbleInLeft {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bubbleInRight {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bubble-in-left {
+  animation: bubbleInLeft 0.28s ease-out both;
+}
+
+.bubble-in-right {
+  animation: bubbleInRight 0.22s ease-out both;
+}
+
+/* =========================
+   SKILL CHECK — CENA
+========================= */
+
+.skill-scene {
+  background: radial-gradient(
+    circle at top,
+    rgba(251, 191, 36, 0.12),
+    rgba(9, 9, 11, 0.95)
+  );
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.skill-option {
+  transition: all 0.15s ease;
+}
+
+.skill-option-selected {
+  background-color: rgb(251 191 36);
+  color: black;
+  transform: translateY(-1px);
+}
+
+.skill-roll {
+  background: linear-gradient(
+    135deg,
+    rgb(251 191 36),
+    rgb(245 158 11)
+  );
+  color: black;
 }

@@ -1,6 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { apiPost } from "../services/api";
 
+import NarrativeBubble from "./NarrativeBubble";
+import PlayerBubble from "./PlayerBubble";
+
+import mestreAvatar from "../assets/mestre.png";
+
+/* ================================
+   TYPES
+================================= */
+
 type SkillCheck = {
   prompt: string;
   difficultyClass: number;
@@ -21,6 +30,7 @@ type Props = {
 /* ================================
    🧠 TEXTOS – IA “PENSANDO”
 ================================= */
+
 const THINKING_TEXTS = [
   "O mundo parece suspender a respiração…",
   "Forças invisíveis se rearranjam ao seu redor…",
@@ -28,6 +38,10 @@ const THINKING_TEXTS = [
   "Algo se move além do que seus sentidos alcançam…",
   "O silêncio carrega possibilidades ocultas…"
 ];
+
+/* ================================
+   COMPONENT
+================================= */
 
 export default function GameChat({
   campaignId,
@@ -54,6 +68,7 @@ export default function GameChat({
   /* ================================
      📜 Scroll automático
   ================================= */
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, skillCheck, loading]);
@@ -61,6 +76,7 @@ export default function GameChat({
   /* ================================
      🌱 INÍCIO DA CAMPANHA (UMA VEZ)
   ================================= */
+
   useEffect(() => {
     if (!campaignId || !characterId || hasStarted) return;
 
@@ -100,6 +116,7 @@ export default function GameChat({
   /* ================================
      🎭 Ação textual
   ================================= */
+
   async function sendAction(actionText: string) {
     if (!actionText.trim() || loading || skillCheck) return;
 
@@ -133,6 +150,7 @@ export default function GameChat({
   /* ================================
      🎲 Rolagem de dado
   ================================= */
+
   async function rollDice() {
     if (!selectedSkill || loading || !skillCheck) return;
 
@@ -173,6 +191,7 @@ export default function GameChat({
   /* ================================
      ⌨️ Enter
   ================================= */
+
   function handleKeyDown(
     e: React.KeyboardEvent<HTMLInputElement>
   ) {
@@ -185,10 +204,12 @@ export default function GameChat({
   /* ================================
      📖 Render
   ================================= */
+
   return (
     <div className="game-chat bg-zinc-950 text-zinc-100">
-      <header className="game-chat-header flex items-center justify-between px-6 py-4 border-b border-zinc-800">
-        <h2 className="text-sm uppercase tracking-widest text-zinc-400">
+      {/* HEADER — agora sempre visível */}
+      <header className="game-chat-header relative z-10 bg-zinc-950 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-zinc-800">
+        <h2 className="text-xs sm:text-sm uppercase tracking-widest text-zinc-400">
           Aventura em andamento
         </h2>
 
@@ -201,35 +222,38 @@ export default function GameChat({
             setInput("");
             if (onExit) onExit();
           }}
-          className="text-sm text-amber-400 hover:underline"
+          className="
+            flex items-center gap-2
+            px-3 py-2
+            text-xs sm:text-sm
+            rounded-md
+            border border-zinc-700
+            bg-zinc-900
+            text-amber-400
+            hover:bg-zinc-800
+            active:scale-[0.98]
+          "
         >
-          ← Voltar ao menu
+          ← Menu
         </button>
       </header>
 
-      <div className="game-chat-messages px-6 py-8 space-y-10">
+      {/* MESSAGES */}
+      <div className="game-chat-messages px-4 sm:px-6 py-8 space-y-10">
         {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={
-              msg.role === "narrative"
-                ? "max-w-3xl mx-auto narrative-text whitespace-pre-line"
-                : "max-w-3xl mx-auto text-right player-text"
-            }
-          >
-            {msg.role === "player" && (
-              <span className="block mb-1 text-xs text-zinc-500">
-                Sua ação
-              </span>
+          <div key={idx}>
+            {msg.role === "narrative" ? (
+              <NarrativeBubble
+                text={msg.content}
+                avatar={mestreAvatar}
+                speaker="Mestre"
+              />
+            ) : (
+              <PlayerBubble
+                text={msg.content}
+                playerName="Você"
+              />
             )}
-
-            {(msg.content ?? "")
-              .split("\n\n")
-              .map((p, i) => (
-                <p key={i} className="mb-6">
-                  {p}
-                </p>
-              ))}
           </div>
         ))}
 
@@ -239,44 +263,48 @@ export default function GameChat({
           </div>
         )}
 
+        {/* SKILL CHECK */}
         {skillCheck && skillCheck.options?.length > 0 && (
-          <div className="max-w-3xl mx-auto mt-8 p-5 border-l-4 border-amber-600 bg-zinc-900/60">
-            <p className="mb-4 italic text-zinc-300">
-              {skillCheck.prompt}
-            </p>
+          <div className="max-w-3xl mx-auto mt-10 px-2 sm:px-0">
+            <div className="skill-scene">
+              <p className="mb-5 font-serif text-lg italic text-amber-200">
+                {skillCheck.prompt}
+              </p>
 
-            <div className="flex gap-2 flex-wrap">
-              {skillCheck.options.map(skill => (
+              <div className="flex gap-3 flex-wrap mb-6">
+                {skillCheck.options.map(skill => (
+                  <button
+                    key={skill}
+                    onClick={() => setSelectedSkill(skill)}
+                    className={`skill-option px-4 py-2 rounded-full text-sm border ${
+                      selectedSkill === skill
+                        ? "skill-option-selected"
+                        : "bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700"
+                    }`}
+                  >
+                    {skill}
+                  </button>
+                ))}
+              </div>
+
+              {selectedSkill && (
                 <button
-                  key={skill}
-                  onClick={() => setSelectedSkill(skill)}
-                  className={`px-3 py-1 text-sm rounded-full transition ${
-                    selectedSkill === skill
-                      ? "bg-amber-600 text-black"
-                      : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-                  }`}
+                  onClick={rollDice}
+                  disabled={loading}
+                  className="skill-roll px-6 py-3 rounded-xl font-semibold tracking-wide hover:opacity-90"
                 >
-                  {skill}
+                  🎲 Rolar d20
                 </button>
-              ))}
+              )}
             </div>
-
-            {selectedSkill && (
-              <button
-                onClick={rollDice}
-                disabled={loading}
-                className="mt-4 px-4 py-2 bg-zinc-800 rounded hover:bg-zinc-700"
-              >
-                🎲 Rolar d20
-              </button>
-            )}
           </div>
         )}
 
         <div ref={bottomRef} />
       </div>
 
-      <div className="game-chat-input border-t border-zinc-800 px-4 py-3">
+      {/* INPUT */}
+      <div className="game-chat-input border-t border-zinc-800 px-3 sm:px-4 py-3">
         <div className="flex gap-2">
           <input
             type="text"
@@ -285,13 +313,13 @@ export default function GameChat({
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={loading || !!skillCheck}
-            className="flex-1 bg-zinc-800/70 px-3 py-2 rounded text-zinc-100 text-sm disabled:opacity-40"
+            className="flex-1 bg-zinc-800/70 px-3 py-3 rounded text-zinc-100 text-sm disabled:opacity-40"
           />
 
           <button
             onClick={() => sendAction(input)}
             disabled={!input || loading || !!skillCheck}
-            className="px-4 py-2 bg-amber-600 text-black rounded hover:bg-amber-500 disabled:opacity-40"
+            className="px-4 py-3 bg-amber-600 text-black rounded hover:bg-amber-500 disabled:opacity-40"
           >
             Enviar
           </button>
