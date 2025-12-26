@@ -43,6 +43,8 @@ export default function GameChat({
   const [selectedSkill, setSelectedSkill] =
     useState<string | null>(null);
 
+  const [hasStarted, setHasStarted] = useState(false);
+
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const thinkingTextRef = useRef(
@@ -57,13 +59,15 @@ export default function GameChat({
   }, [messages, skillCheck, loading]);
 
   /* ================================
-     🌱 INÍCIO DA CAMPANHA
+     🌱 INÍCIO DA CAMPANHA (UMA VEZ)
   ================================= */
   useEffect(() => {
-    if (!campaignId || !characterId) return;
+    if (!campaignId || !characterId || hasStarted) return;
+
     startNarrative();
+    setHasStarted(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [campaignId, characterId]);
+  }, [campaignId, characterId, hasStarted]);
 
   async function startNarrative() {
     thinkingTextRef.current =
@@ -190,6 +194,11 @@ export default function GameChat({
 
         <button
           onClick={() => {
+            setHasStarted(false);
+            setMessages([]);
+            setSkillCheck(null);
+            setSelectedSkill(null);
+            setInput("");
             if (onExit) onExit();
           }}
           className="text-sm text-amber-400 hover:underline"
@@ -208,37 +217,36 @@ export default function GameChat({
                 : "max-w-3xl mx-auto text-right player-text"
             }
           >
-
             {msg.role === "player" && (
               <span className="block mb-1 text-xs text-zinc-500">
                 Sua ação
               </span>
             )}
 
-            {msg.content.split("\n\n").map((p, i) => (
-              <p key={i} className="mb-6">
-                {p}
-              </p>
-            ))}
+            {(msg.content ?? "")
+              .split("\n\n")
+              .map((p, i) => (
+                <p key={i} className="mb-6">
+                  {p}
+                </p>
+              ))}
           </div>
         ))}
 
-        {/* 🧠 IA pensando */}
         {loading && (
           <div className="max-w-3xl mx-auto font-serif text-zinc-400 text-lg italic animate-pulse">
             {thinkingTextRef.current}
           </div>
         )}
 
-       {skillCheck && skillCheck.options?.length > 0 && (
-  <div className="max-w-3xl mx-auto mt-8 p-5 border-l-4 border-amber-600 bg-zinc-900/60">
-    <p className="mb-4 italic text-zinc-300">
-      {skillCheck.prompt}
-    </p>
+        {skillCheck && skillCheck.options?.length > 0 && (
+          <div className="max-w-3xl mx-auto mt-8 p-5 border-l-4 border-amber-600 bg-zinc-900/60">
+            <p className="mb-4 italic text-zinc-300">
+              {skillCheck.prompt}
+            </p>
 
-    <div className="flex gap-2 flex-wrap">
-      {skillCheck.options.map(skill => (
-
+            <div className="flex gap-2 flex-wrap">
+              {skillCheck.options.map(skill => (
                 <button
                   key={skill}
                   onClick={() => setSelectedSkill(skill)}
@@ -268,7 +276,7 @@ export default function GameChat({
         <div ref={bottomRef} />
       </div>
 
-    <div className="game-chat-input border-t border-zinc-800 px-4 py-3">
+      <div className="game-chat-input border-t border-zinc-800 px-4 py-3">
         <div className="flex gap-2">
           <input
             type="text"
