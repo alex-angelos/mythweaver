@@ -30,6 +30,9 @@ export default function App() {
   const [isCreating, setIsCreating] = useState(false);
   const [loadingCharacters, setLoadingCharacters] = useState(false);
 
+  // 🔹 Controle da Sidebar no mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   /* ================================
      🔁 Backend → listar personagens
   ================================= */
@@ -44,9 +47,7 @@ export default function App() {
       );
 
       setCharacters(
-        Array.isArray(data?.characters)
-          ? data.characters
-          : []
+        Array.isArray(data?.characters) ? data.characters : []
       );
     } catch (error) {
       console.error("Erro ao carregar personagens:", error);
@@ -72,6 +73,7 @@ export default function App() {
       });
 
       setSelectedCharacterId(null);
+      setIsSidebarOpen(false);
       loadCharacters();
     } catch (error) {
       console.error("Erro ao excluir personagem:", error);
@@ -90,6 +92,7 @@ export default function App() {
       });
 
       setSelectedCharacterId(null);
+      setIsSidebarOpen(false);
       loadCharacters();
     } catch (error) {
       console.error("Erro ao copiar personagem:", error);
@@ -110,12 +113,44 @@ export default function App() {
   ================================= */
 
   return (
-   <div className="flex h-screen overflow-hidden bg-[#09090b] text-[#f4f4f5]">
-      {/* Sidebar (somente no jogo) */}
-      {isInGame && <Sidebar character={selectedCharacter} />}
+    <div className="flex h-screen overflow-hidden bg-[#09090b] text-[#f4f4f5]">
+      {/* =============================
+         📂 SIDEBAR
+         Desktop: fixa
+         Mobile: drawer
+      ============================== */}
+      {selectedCharacter && (
+        <>
+          {/* Overlay mobile */}
+          {isSidebarOpen && (
+            <div
+              className="fixed inset-0 bg-black/60 z-40 md:hidden"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          )}
 
+          <div
+            className={`
+              fixed md:static z-50 md:z-auto
+              inset-y-0 left-0
+              transform transition-transform duration-300
+              ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+              md:translate-x-0
+            `}
+          >
+            <Sidebar
+              character={selectedCharacter}
+              onClose={() => setIsSidebarOpen(false)}
+            />
+          </div>
+        </>
+      )}
+
+      {/* =============================
+         📜 CONTEÚDO PRINCIPAL
+      ============================== */}
       <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
-        {/* Header (somente fora do jogo) */}
+        {/* Header (fora do jogo) */}
         {!isInGame && (
           <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
             <h1 className="text-xl font-semibold tracking-wide">
@@ -131,8 +166,26 @@ export default function App() {
           </header>
         )}
 
+        {/* Header mobile (dentro do jogo) */}
+        {isInGame && (
+          <header className="md:hidden flex items-center justify-between px-4 py-3 border-b border-zinc-800">
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="text-zinc-300 text-lg"
+            >
+              ☰
+            </button>
+
+            <span className="text-sm tracking-wide text-zinc-400">
+              Mythweaver
+            </span>
+
+            <div className="w-6" />
+          </header>
+        )}
+
         {/* Conteúdo */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden min-h-0">
           {isCreating ? (
             <CharacterCreation
               campaignId={campaignId}
@@ -142,12 +195,13 @@ export default function App() {
               }}
               onCancel={() => setIsCreating(false)}
             />
-          ) : isInGame ? (
+          ) : isInGame && selectedCharacter ? (
             <GameChat
               campaignId={campaignId}
               characterId={selectedCharacter.id}
               onExit={() => {
                 setSelectedCharacterId(null);
+                setIsSidebarOpen(false);
               }}
             />
           ) : (
