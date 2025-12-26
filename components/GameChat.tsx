@@ -230,14 +230,15 @@ export default function GameChat({
           </div>
         )}
 
-        {skillCheck && (
-          <div className="max-w-3xl mx-auto mt-8 p-5 border-l-4 border-amber-600 bg-zinc-900/60">
-            <p className="mb-4 italic text-zinc-300">
-              {skillCheck.prompt}
-            </p>
+       {skillCheck && skillCheck.options?.length > 0 && (
+  <div className="max-w-3xl mx-auto mt-8 p-5 border-l-4 border-amber-600 bg-zinc-900/60">
+    <p className="mb-4 italic text-zinc-300">
+      {skillCheck.prompt}
+    </p>
 
-            <div className="flex gap-2 flex-wrap">
-              {skillCheck.options.map(skill => (
+    <div className="flex gap-2 flex-wrap">
+      {skillCheck.options.map(skill => (
+
                 <button
                   key={skill}
                   onClick={() => setSelectedSkill(skill)}
