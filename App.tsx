@@ -110,7 +110,7 @@ export default function App() {
   ================================= */
 
   return (
-    <div className="flex h-screen bg-[#09090b] text-[#f4f4f5]">
+    <div className="flex min-h-screen bg-[#09090b] text-[#f4f4f5]">
       {/* =============================
          📂 Sidebar (SÓ NO JOGO)
       ============================== */}
@@ -155,7 +155,6 @@ export default function App() {
                 setSelectedCharacterId(null);
               }}
             />
-
           ) : (
             <CharacterList
               characters={characters}

@@ -206,9 +206,9 @@ export default function GameChat({
   ================================= */
 
   return (
-    <div className="game-chat bg-zinc-950 text-zinc-100">
-      {/* HEADER — agora sempre visível */}
-      <header className="game-chat-header flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950 z-20">
+    <div className="game-chat bg-zinc-950 text-zinc-100 h-full">
+      {/* HEADER */}
+      <header className="game-chat-header sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950">
         <h2 className="text-xs sm:text-sm uppercase tracking-widest text-zinc-400">
           Aventura em andamento
         </h2>
@@ -222,43 +222,41 @@ export default function GameChat({
             setInput("");
             if (onExit) onExit();
           }}
-         className="text-sm text-amber-400 hover:underline whitespace-nowrap"
-
+          className="text-sm text-amber-400 hover:underline whitespace-nowrap"
         >
           ← Menu
         </button>
       </header>
 
-      {/* MESSAGES */}
-      <div className="game-chat-messages px-4 sm:px-6 py-8 space-y-10">
-        {messages.map((msg, idx) => (
-          <div key={idx}>
-            {msg.role === "narrative" ? (
-              <NarrativeBubble
-                text={msg.content}
-                avatar={mestreAvatar}
-                speaker="Mestre"
-              />
-            ) : (
-              <PlayerBubble
-                text={msg.content}
-                playerName="Você"
-              />
-            )}
-          </div>
-        ))}
+      {/* WRAPPER FIXO DO SCROLL */}
+      <div className="flex-1 overflow-hidden">
+        <div className="game-chat-messages px-4 sm:px-6 py-8 space-y-10">
+          {messages.map((msg, idx) => (
+            <div key={idx}>
+              {msg.role === "narrative" ? (
+                <NarrativeBubble
+                  text={msg.content}
+                  avatar={mestreAvatar}
+                  speaker="Mestre"
+                />
+              ) : (
+                <PlayerBubble
+                  text={msg.content}
+                  playerName="Você"
+                />
+              )}
+            </div>
+          ))}
 
-        {loading && (
-          <div className="max-w-3xl mx-auto font-serif text-zinc-400 text-lg italic animate-pulse">
-            {thinkingTextRef.current}
-          </div>
-        )}
+          {loading && (
+            <div className="max-w-3xl mx-auto font-serif text-zinc-400 text-lg italic animate-pulse">
+              {thinkingTextRef.current}
+            </div>
+          )}
 
-        {/* SKILL CHECK */}
-        {skillCheck && skillCheck.options?.length > 0 && (
-          <div className="max-w-3xl mx-auto mt-10 px-2 sm:px-0">
-            <div className="skill-scene">
-              <p className="mb-5 font-serif text-lg italic text-amber-200">
+          {skillCheck && skillCheck.options?.length > 0 && (
+            <div className="skill-check max-w-3xl mx-auto mt-8 p-6 border-l-4 border-amber-600 bg-zinc-900/70 rounded-xl">
+              <p className="mb-6 font-serif text-lg italic text-amber-200">
                 {skillCheck.prompt}
               </p>
 
@@ -267,10 +265,8 @@ export default function GameChat({
                   <button
                     key={skill}
                     onClick={() => setSelectedSkill(skill)}
-                    className={`skill-option px-4 py-2 rounded-full text-sm border ${
-                      selectedSkill === skill
-                        ? "skill-option-selected"
-                        : "bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700"
+                    className={`skill-option px-4 py-2 text-sm rounded-full transition ${
+                      selectedSkill === skill ? "selected" : ""
                     }`}
                   >
                     {skill}
@@ -282,16 +278,16 @@ export default function GameChat({
                 <button
                   onClick={rollDice}
                   disabled={loading}
-                  className="skill-roll px-6 py-3 rounded-xl font-semibold tracking-wide hover:opacity-90"
+                  className="roll-dice-button px-5 py-2 rounded transition"
                 >
                   🎲 Rolar d20
                 </button>
               )}
             </div>
-          </div>
-        )}
+          )}
 
-        <div ref={bottomRef} />
+          <div ref={bottomRef} />
+        </div>
       </div>
 
       {/* INPUT */}

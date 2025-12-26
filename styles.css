@@ -2,14 +2,69 @@
    BASE GLOBAL
 ========================= */
 
+html,
 body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
   background-color: #09090b; /* zinc-950 */
   color: #f4f4f5; /* zinc-100 */
-  margin: 0;
+  overflow: hidden; /* ⚠️ CRÍTICO: evita scroll duplo */
 }
 
 /* =========================
-   NARRATIVA
+   GAME CHAT LAYOUT (ESTRUTURAL)
+========================= */
+
+.game-chat {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: #09090b;
+  overflow: hidden; /* ⚠️ impede o header de sumir */
+}
+
+/* =========================
+   HEADER FIXO
+========================= */
+
+.game-chat-header{
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: #09090b;
+}
+
+/* =========================
+   ÁREA DE MENSAGENS (SCROLL)
+========================= */
+
+.game-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 3rem; /* espaço para o input */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========================
+   INPUT FIXO
+========================= */
+
+.game-chat-input {
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 90;
+  background-color: #18181b;
+}
+
+/* =========================
+   TEXTO NARRATIVO
 ========================= */
 
 .narrative-text {
@@ -26,6 +81,64 @@ body {
 }
 
 /* =========================
+   SKILL CHECK — PERÍCIAS
+========================= */
+
+.skill-check {
+  background-color: rgba(24, 24, 27, 0.9);
+  border-radius: 12px;
+}
+
+.skill-option {
+  background: #27272a;
+  color: #d4d4d8;
+  border: 1px solid #3f3f46;
+}
+
+.skill-option:hover {
+  background: #3f3f46;
+}
+
+.skill-option.selected {
+  background: linear-gradient(145deg, #f59e0b, #d97706);
+  color: #09090b;
+  border-color: #f59e0b;
+
+  box-shadow:
+    0 0 0 2px rgba(245, 158, 11, 0.35),
+    0 6px 18px rgba(245, 158, 11, 0.35);
+
+  transform: translateY(-1px);
+}
+
+/* =========================
+   BOTÃO DE DADO
+========================= */
+
+.roll-dice-button {
+  background: #27272a;
+  color: #e4e4e7;
+  border: 1px solid #3f3f46;
+}
+
+.roll-dice-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.roll-dice-button:not(:disabled):hover {
+  background: linear-gradient(145deg, #f59e0b, #d97706);
+  color: #09090b;
+  border-color: #f59e0b;
+
+  box-shadow:
+    0 0 0 2px rgba(245, 158, 11, 0.4),
+    0 10px 30px rgba(245, 158, 11, 0.45);
+
+  transform: translateY(-1px);
+}
+
+/* =========================
    MOBILE FIRST
 ========================= */
 
@@ -39,150 +152,4 @@ body {
   input {
     min-height: 44px;
   }
-}
-
-/* =========================
-   GAME CHAT LAYOUT
-========================= */
-
-.game-chat {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-}
-
-
-.game-chat-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background-color: #09090b; /* mesmo fundo do app */
-  flex-shrink: 0;
-}
-
-
-.game-chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 2rem; /* 👈 IMPORTANTE */
-}
-
-.game-chat-input {
-  flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
-  background-color: #18181b;
-}
-
-/* =========================
-   SIDEBAR RESPONSIVA
-========================= */
-
-.sidebar {
-  width: 280px;
-  flex-shrink: 0;
-  background-color: #18181b;
-}
-
-/* Mobile behavior */
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    inset: 0 auto 0 0;
-    z-index: 50;
-    transform: translateX(-100%);
-    transition: transform 0.25s ease;
-    background-color: #18181b;
-  }
-
-  .sidebar.open {
-    transform: translateX(0);
-  }
-
-  .sidebar-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 40;
-  }
-}
-
-/* =========================
-   FLOATING BUTTON
-========================= */
-
-.sidebar-toggle {
-  position: fixed;
-  bottom: 80px;
-  right: 16px;
-  z-index: 60;
-}
-
-/* =========================
-   MICROANIMAÇÕES — CHAT
-========================= */
-
-@keyframes bubbleInLeft {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes bubbleInRight {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.bubble-in-left {
-  animation: bubbleInLeft 0.28s ease-out both;
-}
-
-.bubble-in-right {
-  animation: bubbleInRight 0.22s ease-out both;
-}
-
-/* =========================
-   SKILL CHECK — CENA
-========================= */
-
-.skill-scene {
-  background: radial-gradient(
-    circle at top,
-    rgba(251, 191, 36, 0.12),
-    rgba(9, 9, 11, 0.95)
-  );
-  border: 1px solid rgba(251, 191, 36, 0.35);
-  border-radius: 16px;
-  padding: 20px;
-}
-
-.skill-option {
-  transition: all 0.15s ease;
-}
-
-.skill-option-selected {
-  background-color: rgb(251 191 36);
-  color: black;
-  transform: translateY(-1px);
-}
-
-.skill-roll {
-  background: linear-gradient(
-    135deg,
-    rgb(251 191 36),
-    rgb(245 158 11)
-  );
-  color: black;
 }
