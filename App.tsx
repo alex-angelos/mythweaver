@@ -151,7 +151,11 @@ export default function App() {
             <GameChat
               campaignId={campaignId}
               characterId={selectedCharacter.id}
+              onExit={() => {
+                setSelectedCharacterId(null);
+              }}
             />
+
           ) : (
             <CharacterList
               characters={characters}
