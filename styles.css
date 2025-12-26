@@ -46,10 +46,11 @@ body {
 ========================= */
 
 .game-chat {
-  height: 100dvh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }
+
 
 .game-chat-header {
   position: sticky;
@@ -64,6 +65,7 @@ body {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  padding-bottom: 2rem; /* 👈 IMPORTANTE */
 }
 
 .game-chat-input {
