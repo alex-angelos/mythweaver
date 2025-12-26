@@ -208,7 +208,7 @@ export default function GameChat({
   return (
     <div className="game-chat bg-zinc-950 text-zinc-100">
       {/* HEADER — agora sempre visível */}
-      <header className="game-chat-header relative z-10 bg-zinc-950 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-zinc-800">
+      <header className="game-chat-header flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950 z-20">
         <h2 className="text-xs sm:text-sm uppercase tracking-widest text-zinc-400">
           Aventura em andamento
         </h2>
@@ -222,17 +222,8 @@ export default function GameChat({
             setInput("");
             if (onExit) onExit();
           }}
-          className="
-            flex items-center gap-2
-            px-3 py-2
-            text-xs sm:text-sm
-            rounded-md
-            border border-zinc-700
-            bg-zinc-900
-            text-amber-400
-            hover:bg-zinc-800
-            active:scale-[0.98]
-          "
+         className="text-sm text-amber-400 hover:underline whitespace-nowrap"
+
         >
           ← Menu
         </button>
