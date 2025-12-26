@@ -11,7 +11,7 @@ body {
   margin: 0;
   background-color: #09090b; /* zinc-950 */
   color: #f4f4f5; /* zinc-100 */
-  overflow: hidden; /* ⚠️ CRÍTICO: evita scroll duplo */
+  overflow: hidden; /* evita scroll duplo */
 }
 
 /* =========================
@@ -19,48 +19,45 @@ body {
 ========================= */
 
 .game-chat {
-  height: 100dvh;
+  height: 100%;
+  min-height: 0;              /* 🔑 FUNDAMENTAL */
   display: flex;
   flex-direction: column;
-  background-color: #09090b;
-  overflow: hidden; /* ⚠️ impede o header de sumir */
+  overflow: hidden;
 }
 
 /* =========================
-   HEADER FIXO
+   HEADER (FIXO POR FLEX)
 ========================= */
 
-.game-chat-header{
+.game-chat-header {
   flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
   background-color: #09090b;
+  z-index: 10;
 }
 
 /* =========================
-   ÁREA DE MENSAGENS (SCROLL)
+   ÁREA DE MENSAGENS (ÚNICO SCROLL)
 ========================= */
 
 .game-chat-messages {
   flex: 1;
+  min-height: 0;              /* 🔑 FUNDAMENTAL */
   overflow-y: auto;
   overflow-x: hidden;
-  padding-bottom: 3rem; /* espaço para o input */
+  padding-bottom: 2rem;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
 
 /* =========================
-   INPUT FIXO
+   INPUT (FIXO POR FLEX)
 ========================= */
 
 .game-chat-input {
   flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
-  z-index: 90;
   background-color: #18181b;
+  z-index: 10;
 }
 
 /* =========================

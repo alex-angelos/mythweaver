@@ -66,7 +66,7 @@ export default function GameChat({
   );
 
   /* ================================
-     📜 Scroll automático
+     📜 Scroll automático (APENAS NO MIOL0)
   ================================= */
 
   useEffect(() => {
@@ -206,9 +206,9 @@ export default function GameChat({
   ================================= */
 
   return (
-    <div className="game-chat bg-zinc-950 text-zinc-100 h-full">
-      {/* HEADER */}
-      <header className="game-chat-header sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950">
+    <div className="game-chat h-full flex flex-col overflow-hidden bg-zinc-950 text-zinc-100">
+      {/* HEADER — FIXO POR LAYOUT */}
+      <header className="game-chat-header flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950">
         <h2 className="text-xs sm:text-sm uppercase tracking-widest text-zinc-400">
           Aventura em andamento
         </h2>
@@ -228,70 +228,68 @@ export default function GameChat({
         </button>
       </header>
 
-      {/* WRAPPER FIXO DO SCROLL */}
-      <div className="flex-1 overflow-hidden">
-        <div className="game-chat-messages px-4 sm:px-6 py-8 space-y-10">
-          {messages.map((msg, idx) => (
-            <div key={idx}>
-              {msg.role === "narrative" ? (
-                <NarrativeBubble
-                  text={msg.content}
-                  avatar={mestreAvatar}
-                  speaker="Mestre"
-                />
-              ) : (
-                <PlayerBubble
-                  text={msg.content}
-                  playerName="Você"
-                />
-              )}
-            </div>
-          ))}
+      {/* MENSAGENS — ÚNICO SCROLL */}
+      <div className="game-chat-messages flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-6 py-8 space-y-10">
+        {messages.map((msg, idx) => (
+          <div key={idx}>
+            {msg.role === "narrative" ? (
+              <NarrativeBubble
+                text={msg.content}
+                avatar={mestreAvatar}
+                speaker="Mestre"
+              />
+            ) : (
+              <PlayerBubble
+                text={msg.content}
+                playerName="Você"
+              />
+            )}
+          </div>
+        ))}
 
-          {loading && (
-            <div className="max-w-3xl mx-auto font-serif text-zinc-400 text-lg italic animate-pulse">
-              {thinkingTextRef.current}
-            </div>
-          )}
+        {loading && (
+          <div className="max-w-3xl mx-auto font-serif text-zinc-400 text-lg italic animate-pulse">
+            {thinkingTextRef.current}
+          </div>
+        )}
 
-          {skillCheck && skillCheck.options?.length > 0 && (
-            <div className="skill-check max-w-3xl mx-auto mt-8 p-6 border-l-4 border-amber-600 bg-zinc-900/70 rounded-xl">
-              <p className="mb-6 font-serif text-lg italic text-amber-200">
-                {skillCheck.prompt}
-              </p>
+        {skillCheck && skillCheck.options?.length > 0 && (
+          <div className="skill-check max-w-3xl mx-auto mt-8 p-6 border-l-4 border-amber-600 bg-zinc-900/70 rounded-xl">
+            <p className="mb-6 font-serif text-lg italic text-amber-200">
+              {skillCheck.prompt}
+            </p>
 
-              <div className="flex gap-3 flex-wrap mb-6">
-                {skillCheck.options.map(skill => (
-                  <button
-                    key={skill}
-                    onClick={() => setSelectedSkill(skill)}
-                    className={`skill-option px-4 py-2 text-sm rounded-full transition ${
-                      selectedSkill === skill ? "selected" : ""
-                    }`}
-                  >
-                    {skill}
-                  </button>
-                ))}
-              </div>
-
-              {selectedSkill && (
+            <div className="flex gap-3 flex-wrap mb-6">
+              {skillCheck.options.map(skill => (
                 <button
-                  onClick={rollDice}
-                  disabled={loading}
-                  className="roll-dice-button px-5 py-2 rounded transition"
+                  key={skill}
+                  onClick={() => setSelectedSkill(skill)}
+                  className={`skill-option px-4 py-2 text-sm rounded-full transition ${
+                    selectedSkill === skill ? "selected" : ""
+                  }`}
                 >
-                  🎲 Rolar d20
+                  {skill}
                 </button>
-              )}
+              ))}
             </div>
-          )}
 
-          <div ref={bottomRef} />
-        </div>
+            {selectedSkill && (
+              <button
+                onClick={rollDice}
+                disabled={loading}
+                className="roll-dice-button px-5 py-2 rounded transition"
+              >
+                🎲 Rolar d20
+              </button>
+            )}
+          </div>
+        )}
+
+        <div ref={bottomRef} />
       </div>
 
-      {/* INPUT */}
-      <div className="game-chat-input border-t border-zinc-800 px-3 sm:px-4 py-3">
+      {/* INPUT — FIXO POR LAYOUT */}
+      <div className="game-chat-input flex-shrink-0 border-t border-zinc-800 px-3 sm:px-4 py-3 bg-zinc-950">
         <div className="flex gap-2">
           <input
             type="text"

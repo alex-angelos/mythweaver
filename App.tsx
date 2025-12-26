@@ -110,31 +110,26 @@ export default function App() {
   ================================= */
 
   return (
-    <div className="flex min-h-screen bg-[#09090b] text-[#f4f4f5]">
-      {/* =============================
-         📂 Sidebar (SÓ NO JOGO)
-      ============================== */}
+   <div className="flex h-screen overflow-hidden bg-[#09090b] text-[#f4f4f5]">
+      {/* Sidebar (somente no jogo) */}
       {isInGame && <Sidebar character={selectedCharacter} />}
 
-      {/* =============================
-         📜 Conteúdo principal
-      ============================== */}
-      <main className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
-          <h1 className="text-xl font-semibold tracking-wide">
-            Mythweaver
-          </h1>
+      <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        {/* Header (somente fora do jogo) */}
+        {!isInGame && (
+          <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+            <h1 className="text-xl font-semibold tracking-wide">
+              Mythweaver
+            </h1>
 
-          {!isInGame && (
             <button
               onClick={() => setIsCreating(true)}
               className="px-3 py-1 bg-amber-600 text-black rounded hover:bg-amber-500"
             >
               Novo Personagem
             </button>
-          )}
-        </header>
+          </header>
+        )}
 
         {/* Conteúdo */}
         <div className="flex-1 overflow-hidden">
