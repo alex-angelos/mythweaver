@@ -1,18 +1,25 @@
-
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App";
 import "./styles.css";
 
+// ✅ Garante que só há UM root ativo
+const container = document.getElementById("root");
+if (!container) throw new Error("Root element not found");
 
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
+let root = (container as any)._reactRootContainer;
+
+// Se o root já existe, apenas renderiza novamente
+if (!root) {
+  root = ReactDOM.createRoot(container);
 }
 
-const root = ReactDOM.createRoot(rootElement);
+// 🚀 Render único e seguro
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </React.StrictMode>
 );

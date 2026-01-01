@@ -14,6 +14,9 @@ export type Character = {
   name: string;
   race: string;
   class: string;
+  // campos opcionais que o Sidebar pode tentar mapear
+  inventory?: any[];
+  spells?: any[];
 };
 
 /* ================================
@@ -23,7 +26,7 @@ export type Character = {
 export default function App() {
   const [campaignId] = useState("main_campaign");
 
-  const [characters, setCharacters] = useState<Character[]>([]);
+  const [characters, setCharacters] = useState<Character[]>([]); // ✅ blindagem inicial
   const [selectedCharacterId, setSelectedCharacterId] =
     useState<string | null>(null);
 
@@ -116,8 +119,6 @@ export default function App() {
     <div className="flex h-screen overflow-hidden bg-[#09090b] text-[#f4f4f5]">
       {/* =============================
          📂 SIDEBAR
-         Desktop: fixa
-         Mobile: drawer
       ============================== */}
       {selectedCharacter && (
         <>
@@ -138,8 +139,17 @@ export default function App() {
               md:translate-x-0
             `}
           >
+            {/* ✅ Blindagem para evitar map() em undefined */}
             <Sidebar
-              character={selectedCharacter}
+              character={{
+                ...selectedCharacter,
+                inventory: Array.isArray(selectedCharacter.inventory)
+                  ? selectedCharacter.inventory
+                  : [],
+                spells: Array.isArray(selectedCharacter.spells)
+                  ? selectedCharacter.spells
+                  : []
+              }}
               onClose={() => setIsSidebarOpen(false)}
             />
           </div>
@@ -151,7 +161,7 @@ export default function App() {
       ============================== */}
       <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
         {/* Header (fora do jogo) */}
-        {!isInGame && (
+        {!isInGame && !isCreating && (
           <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
             <h1 className="text-xl font-semibold tracking-wide">
               Mythweaver
@@ -193,7 +203,6 @@ export default function App() {
                 setIsCreating(false);
                 loadCharacters();
               }}
-              onCancel={() => setIsCreating(false)}
             />
           ) : isInGame && selectedCharacter ? (
             <GameChat
@@ -206,7 +215,7 @@ export default function App() {
             />
           ) : (
             <CharacterList
-              characters={characters}
+              characters={Array.isArray(characters) ? characters : []}
               loading={loadingCharacters}
               onSelect={id => setSelectedCharacterId(id)}
               onDelete={deleteCharacter}

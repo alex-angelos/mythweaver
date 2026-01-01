@@ -1,4 +1,16 @@
 import { useEffect, useState } from "react";
+import {
+  UserCircle,
+  MapPin,
+  ScrollText,
+  Activity,
+  Heart,
+  Zap,
+  TrendingUp,
+  Scale,
+  Backpack,
+  Sparkles
+} from "lucide-react";
 import avatarPadrao from "../assets/avatar_padrao.png";
 
 type Character = {
@@ -10,6 +22,7 @@ type Character = {
   currentEmotion?: string;
 
   inventory?: { name: string; quantity?: number }[];
+  spells?: { name: string; description?: string }[];
 
   reputation?: {
     global?: {
@@ -33,19 +46,19 @@ type Character = {
     level?: number;
 
     hp?: {
-      current: number;
-      max: number;
+      current?: number;
+      max?: number;
     };
 
     points?: {
       label?: string;
-      current: number;
-      max: number;
+      current?: number;
+      max?: number;
     };
 
     xp?: {
-      current: number;
-      nextLevel: number;
+      current?: number;
+      nextLevel?: number;
     };
   };
 };
@@ -63,16 +76,13 @@ export default function Sidebar({ character, onClose }: Props) {
   const [animatePointer, setAnimatePointer] = useState(false);
   const [showReputationHint, setShowReputationHint] = useState(false);
 
-  /* =============================
-     🖼️ AVATAR
-  ============================== */
-
   const [avatar, setAvatar] = useState<string>(avatarPadrao);
   const [showAvatarEditor, setShowAvatarEditor] = useState(false);
   const [tempAvatar, setTempAvatar] = useState<string | null>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
-  if (!character) {
+  // ✅ Blindagem inicial
+  if (!character || !character.id) {
     return (
       <aside className="sidebar w-72 border-r border-zinc-800 bg-zinc-950 p-4 text-zinc-500">
         <p className="text-sm italic">Nenhum personagem selecionado.</p>
@@ -80,13 +90,11 @@ export default function Sidebar({ character, onClose }: Props) {
     );
   }
 
-  /* =============================
-     DADOS BÁSICOS
-  ============================== */
-
+  // ✅ Fallbacks seguros
   const inventory = Array.isArray(character.inventory)
     ? character.inventory
     : [];
+  const spells = Array.isArray(character.spells) ? character.spells : [];
 
   const fama = character.reputation?.global?.fama ?? 0;
   const infamia = character.reputation?.global?.infamia ?? 0;
@@ -106,6 +114,7 @@ export default function Sidebar({ character, onClose }: Props) {
 
   let reputationNarrative =
     "O mundo observa suas escolhas com cautela.";
+
   if (reputationScore <= -30) {
     reputationNarrative =
       "Seu nome é sussurrado com medo. Onde você passa, a desconfiança o precede.";
@@ -118,8 +127,7 @@ export default function Sidebar({ character, onClose }: Props) {
     character.currentMission?.title ?? "Sem missão ativa";
 
   const missionObjective =
-    character.currentMission?.objective ??
-    "Nenhum objetivo definido.";
+    character.currentMission?.objective ?? "Nenhum objetivo definido.";
 
   const location = {
     world: character.location?.world ?? "Mundo desconhecido",
@@ -127,36 +135,23 @@ export default function Sidebar({ character, onClose }: Props) {
     city: character.location?.city ?? "Local não identificado"
   };
 
-  /* =============================
-     STATUS VITAIS
-  ============================== */
-
   const level = character.stats?.level ?? 1;
 
   const hpCurrent = character.stats?.hp?.current ?? 10;
   const hpMax = character.stats?.hp?.max ?? 10;
-  const hpPercent = Math.min(100, (hpCurrent / hpMax) * 100);
+  const hpPercent = hpMax > 0 ? Math.min(100, (hpCurrent / hpMax) * 100) : 0;
 
-  const pointsLabel =
-    character.stats?.points?.label ?? "Pontos";
+  const pointsLabel = character.stats?.points?.label ?? "Pontos";
   const pointsCurrent = character.stats?.points?.current ?? 5;
   const pointsMax = character.stats?.points?.max ?? 5;
-  const pointsPercent = Math.min(
-    100,
-    (pointsCurrent / pointsMax) * 100
-  );
+  const pointsPercent =
+    pointsMax > 0 ? Math.min(100, (pointsCurrent / pointsMax) * 100) : 0;
 
   const xpCurrent = character.stats?.xp?.current ?? 0;
   const xpNext = character.stats?.xp?.nextLevel ?? 100;
-  const xpPercent = Math.min(100, (xpCurrent / xpNext) * 100);
+  const xpPercent = xpNext > 0 ? Math.min(100, (xpCurrent / xpNext) * 100) : 0;
 
-  /* =============================
-     📷 UPLOAD AVATAR
-  ============================== */
-
-  function handleAvatarChange(
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -173,7 +168,6 @@ export default function Sidebar({ character, onClose }: Props) {
 
   return (
     <aside className="sidebar relative w-72 border-r border-zinc-800 bg-zinc-950 flex flex-col">
-      {/* ❌ FECHAR (MOBILE) */}
       {onClose && (
         <button
           onClick={onClose}
@@ -183,7 +177,7 @@ export default function Sidebar({ character, onClose }: Props) {
         </button>
       )}
 
-      {/* 🖼️ AVATAR */}
+      {/* AVATAR */}
       <div className="p-4 border-b border-zinc-800 flex flex-col items-center gap-3">
         <img
           src={avatar}
@@ -201,7 +195,8 @@ export default function Sidebar({ character, onClose }: Props) {
           />
         </label>
 
-        <h2 className="text-lg font-semibold text-amber-400 mt-2">
+        <h2 className="text-lg font-semibold text-amber-400 mt-2 flex items-center gap-2">
+          <UserCircle size={18} />
           {character.name}
         </h2>
 
@@ -211,9 +206,10 @@ export default function Sidebar({ character, onClose }: Props) {
         </p>
       </div>
 
-      {/* 🌍 LOCALIZAÇÃO */}
+      {/* LOCALIZAÇÃO */}
       <div className="px-4 py-3 border-b border-zinc-800 text-xs text-zinc-400">
-        <p className="uppercase tracking-wide text-zinc-500 mb-1">
+        <p className="uppercase tracking-wide text-zinc-500 mb-1 flex items-center gap-2">
+          <MapPin size={14} />
           Localização
         </p>
         <p className="text-zinc-300">{location.city}</p>
@@ -222,28 +218,27 @@ export default function Sidebar({ character, onClose }: Props) {
         </p>
       </div>
 
-      {/* 📜 CONTEÚDO */}
       <div className="flex-1 overflow-y-auto p-4 space-y-5">
-        {/* 🎯 MISSÃO */}
+        {/* MISSÃO */}
         <div className="border-l-4 border-amber-600 bg-zinc-900/60 p-3 rounded-lg">
-          <h3 className="text-xs uppercase tracking-wide text-amber-400 mb-1">
+          <h3 className="text-xs uppercase tracking-wide text-amber-400 mb-1 flex items-center gap-2">
+            <ScrollText size={14} />
             Missão Atual
           </h3>
-          <p className="text-sm font-semibold text-zinc-100">
-            {missionTitle}
-          </p>
-          <p className="text-sm text-zinc-300 mt-1">
-            {missionObjective}
-          </p>
+          <p className="text-sm font-semibold text-zinc-100">{missionTitle}</p>
+          <p className="text-sm text-zinc-300 mt-1">{missionObjective}</p>
         </div>
 
-        {/* 📊 STATUS VITAIS */}
+        {/* STATUS */}
         <div className="bg-zinc-900/40 border border-zinc-800 rounded-lg p-3">
           <button
             onClick={() => setOpenStatus(!openStatus)}
             className="w-full flex justify-between items-center text-zinc-200 font-semibold mb-3"
           >
-            <span>Status</span>
+            <span className="flex items-center gap-2">
+              <Activity size={16} />
+              Status
+            </span>
             <span className="text-sm">
               Nível {level} {openStatus ? "▾" : "▸"}
             </span>
@@ -251,10 +246,15 @@ export default function Sidebar({ character, onClose }: Props) {
 
           {openStatus && (
             <div className="space-y-4">
+              {/* HP */}
               <div>
                 <div className="flex justify-between text-xs text-zinc-400 mb-1">
-                  <span>HP</span>
-                  <span>{hpCurrent}/{hpMax}</span>
+                  <span className="flex items-center gap-1">
+                    <Heart size={12} /> HP
+                  </span>
+                  <span>
+                    {hpCurrent}/{hpMax}
+                  </span>
                 </div>
                 <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                   <div
@@ -264,10 +264,15 @@ export default function Sidebar({ character, onClose }: Props) {
                 </div>
               </div>
 
+              {/* PONTOS */}
               <div>
                 <div className="flex justify-between text-xs text-zinc-400 mb-1">
-                  <span>{pointsLabel}</span>
-                  <span>{pointsCurrent}/{pointsMax}</span>
+                  <span className="flex items-center gap-1">
+                    <Zap size={12} /> {pointsLabel}
+                  </span>
+                  <span>
+                    {pointsCurrent}/{pointsMax}
+                  </span>
                 </div>
                 <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                   <div
@@ -277,10 +282,15 @@ export default function Sidebar({ character, onClose }: Props) {
                 </div>
               </div>
 
+              {/* XP */}
               <div>
                 <div className="flex justify-between text-xs text-zinc-400 mb-1">
-                  <span>XP</span>
-                  <span>{xpCurrent}/{xpNext}</span>
+                  <span className="flex items-center gap-1">
+                    <TrendingUp size={12} /> XP
+                  </span>
+                  <span>
+                    {xpCurrent}/{xpNext}
+                  </span>
                 </div>
                 <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                   <div
@@ -293,16 +303,27 @@ export default function Sidebar({ character, onClose }: Props) {
           )}
         </div>
 
-        {/* ⭐ REPUTAÇÃO */}
-        <div className="relative bg-zinc-900/40 border border-zinc-800 rounded-lg p-3">
-          <h3 className="text-xs uppercase tracking-wide text-zinc-400 mb-3">
+        {/* REPUTAÇÃO */}
+        <div
+          className="relative bg-zinc-900/40 border border-zinc-800 rounded-lg p-3"
+          onMouseEnter={() => setShowReputationHint(true)}
+          onMouseLeave={() => setShowReputationHint(false)}
+        >
+          <h3 className="text-xs uppercase tracking-wide text-zinc-400 mb-3 flex items-center gap-2">
+            <Scale size={14} />
             Reputação
           </h3>
 
+          {showReputationHint && (
+            <div className="absolute z-10 left-1/2 -translate-x-1/2 -top-3 -translate-y-full w-64 bg-zinc-950 border border-zinc-700 rounded-md p-2 text-xs text-zinc-300 shadow-lg">
+              {reputationNarrative}
+            </div>
+          )}
+
           <div className="flex justify-between text-[10px] mb-1">
-            <div className="text-red-400 text-center">😈<div>Vilão</div></div>
-            <div className="text-zinc-300 text-center">⚖️<div>Neutro</div></div>
-            <div className="text-green-400 text-center">🛡️<div>Herói</div></div>
+            <div className="text-red-400 text-center">Vilão</div>
+            <div className="text-zinc-300 text-center">Neutro</div>
+            <div className="text-green-400 text-center">Herói</div>
           </div>
 
           <div className="relative h-4">
@@ -319,13 +340,16 @@ export default function Sidebar({ character, onClose }: Props) {
           <div className="h-2 rounded-full bg-gradient-to-r from-red-600 via-zinc-400 to-green-600 mt-1" />
         </div>
 
-        {/* 🎒 EQUIPAMENTO */}
+        {/* EQUIPAMENTO */}
         <div className="bg-zinc-900/40 border border-zinc-800 rounded-lg p-3">
           <button
             onClick={() => setOpenEquipment(!openEquipment)}
             className="w-full flex justify-between items-center text-zinc-200 font-semibold"
           >
-            <span>Equipamento</span>
+            <span className="flex items-center gap-2">
+              <Backpack size={16} />
+              Equipamento
+            </span>
             <span>{openEquipment ? "▾" : "▸"}</span>
           </button>
 
@@ -344,9 +368,7 @@ export default function Sidebar({ character, onClose }: Props) {
                     >
                       <span>{item.name}</span>
                       {item.quantity !== undefined && (
-                        <span className="text-zinc-500">
-                          x{item.quantity}
-                        </span>
+                        <span className="text-zinc-500">x{item.quantity}</span>
                       )}
                     </li>
                   ))}
@@ -356,127 +378,38 @@ export default function Sidebar({ character, onClose }: Props) {
           )}
         </div>
 
-        {/* ✨ MAGIAS */}
+        {/* MAGIAS */}
         <div className="bg-zinc-900/40 border border-zinc-800 rounded-lg p-3">
           <button
             onClick={() => setOpenSpells(!openSpells)}
             className="w-full flex justify-between items-center text-zinc-200 font-semibold"
           >
-            <span>Magias</span>
+            <span className="flex items-center gap-2">
+              <Sparkles size={16} />
+              Magias
+            </span>
             <span>{openSpells ? "▾" : "▸"}</span>
           </button>
 
           {openSpells && (
-            <p className="mt-3 text-sm text-zinc-500 italic">
-              Nenhuma magia ativa.
-            </p>
+            <div className="mt-3">
+              {spells.length === 0 ? (
+                <p className="text-sm text-zinc-500 italic">
+                  Nenhuma magia ativa.
+                </p>
+              ) : (
+                <ul className="space-y-1 text-sm">
+                  {spells.map((spell, idx) => (
+                    <li key={idx} className="text-zinc-300">
+                      {spell.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           )}
         </div>
       </div>
-
-      {/* 🪟 MODAL DE AJUSTE DO AVATAR */}
-      {showAvatarEditor && tempAvatar && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
-          <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-5 w-80">
-            <h3 className="text-sm text-zinc-200 mb-3">
-              Ajustar avatar
-            </h3>
-
-            <div className="relative w-48 h-48 mx-auto rounded-full overflow-hidden border-2 border-amber-500 bg-zinc-800">
-              <img
-                src={tempAvatar}
-                alt="Avatar em edição"
-                draggable={false}
-                className="absolute cursor-move select-none"
-                style={{
-                  transform: `translate(${offset.x}px, ${offset.y}px)`
-                }}
-                onMouseDown={(e) => {
-                  const startX = e.clientX;
-                  const startY = e.clientY;
-
-                  function onMove(ev: MouseEvent) {
-                    setOffset(prev => ({
-                      x: prev.x + (ev.clientX - startX),
-                      y: prev.y + (ev.clientY - startY)
-                    }));
-                  }
-
-                  function onUp() {
-                    window.removeEventListener("mousemove", onMove);
-                    window.removeEventListener("mouseup", onUp);
-                  }
-
-                  window.addEventListener("mousemove", onMove);
-                  window.addEventListener("mouseup", onUp);
-                }}
-              />
-            </div>
-
-            <p className="text-xs text-zinc-400 text-center mt-3">
-              Arraste a imagem para posicionar
-            </p>
-
-            <div className="flex justify-between mt-4">
-              <button
-                onClick={() => {
-                  setShowAvatarEditor(false);
-                  setTempAvatar(null);
-                }}
-                className="text-sm text-zinc-400 hover:text-zinc-200"
-              >
-                Cancelar
-              </button>
-
-              <button
-                onClick={() => {
-                  if (!tempAvatar) return;
-
-                  const canvas = document.createElement("canvas");
-                  const size = 256;
-                  canvas.width = size;
-                  canvas.height = size;
-
-                  const ctx = canvas.getContext("2d");
-                  if (!ctx) return;
-
-                  const img = new Image();
-                  img.src = tempAvatar;
-
-                  img.onload = () => {
-                    const scale = img.width / 192;
-
-                    const sx = -offset.x * scale;
-                    const sy = -offset.y * scale;
-                    const sw = 192 * scale;
-                    const sh = 192 * scale;
-
-                    ctx.clearRect(0, 0, size, size);
-                    ctx.drawImage(
-                      img,
-                      sx,
-                      sy,
-                      sw,
-                      sh,
-                      0,
-                      0,
-                      size,
-                      size
-                    );
-
-                    setAvatar(canvas.toDataURL("image/png"));
-                    setShowAvatarEditor(false);
-                    setTempAvatar(null);
-                  };
-                }}
-                className="text-sm bg-amber-600 text-black px-3 py-1 rounded hover:bg-amber-500"
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </aside>
   );
 }
