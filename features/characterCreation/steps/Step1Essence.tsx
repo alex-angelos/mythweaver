@@ -743,11 +743,11 @@ function handleCopyAvatarPrompt() {
 
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8 pb-40 overflow-y-auto max-h-[calc(100vh-140px)]">
+    <div className="space-y-8">
 
       {showBackgroundHelp && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-    <div className="bg-zinc-900 border border-zinc-700 rounded-lg max-w-lg p-6 space-y-4">
+    <div className="bg-zinc-900 border border-zinc-700 rounded-lg max-w-lg p-4 md:p-6 space-y-4">
       <div className="flex items-center gap-2 text-amber-400">
         {selectedBackground && BACKGROUNDS[selectedBackground]?.icon}
         <h3 className="text-lg">
@@ -783,13 +783,16 @@ function handleCopyAvatarPrompt() {
 )}
 
       {/* HEADER */}
-      <h1 className="text-amber-400 mb-2">Forjar Personagem</h1>
-      <p className="text-zinc-400 mb-10">
-        Defina a essência do seu personagem
-      </p>
+      <h1 className="text-amber-400 text-xl md:text-2xl mb-1">
+          Forjar Personagem
+        </h1>
+        <p className="text-zinc-400 text-sm md:text-base mb-6">
+          Defina a essência do seu personagem
+        </p>
+
 
       {/* IDENTIDADE */}
-      <section className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 space-y-4 mb-8">
+      <section className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 md:p-6 space-y-4 mb-8">
         <h2 className="text-zinc-300">Identidade</h2>
 
         <div className="flex gap-2">
@@ -799,7 +802,8 @@ function handleCopyAvatarPrompt() {
             onChange={e =>
               onUpdate({ identity: { ...identity, name: e.target.value } })
             }
-            className="flex-1 bg-zinc-900 border border-zinc-800 rounded p-3"
+            className="flex-1 bg-zinc-900 border border-zinc-800 rounded p-3 text-base"
+
           />
           <button
               onClick={handleSuggestName}
@@ -920,7 +924,7 @@ function handleCopyAvatarPrompt() {
       </section>
 
       {/* NARRATIVA */}
-      <section className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 space-y-4 mb-8">
+      <section className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 md:p-6 space-y-4 mb-8">
 
                <div className="space-y-2">
   <div className="flex items-center gap-2 text-zinc-300 text-sm">
@@ -973,7 +977,7 @@ function handleCopyAvatarPrompt() {
             value={appearance}
             onChange={e => setAppearance(e.target.value)}
             placeholder="Aparência"
-            className="flex-1 bg-zinc-900 border border-zinc-800 rounded p-3 resize-none"
+            className="flex-1 bg-zinc-900 border border-zinc-800 rounded p-3 text-base"
           />
           <button
               onClick={handleSuggestAppearance}
@@ -993,7 +997,7 @@ function handleCopyAvatarPrompt() {
             value={backstory}
             onChange={e => setBackstory(e.target.value)}
             placeholder="História"
-            className="flex-1 bg-zinc-900 border border-zinc-800 rounded p-3 resize-none"
+            className="flex-1 bg-zinc-900 border border-zinc-800 rounded p-3 text-base"
           />
           <button
                 onClick={handleSuggestBackstory}
@@ -1014,7 +1018,7 @@ function handleCopyAvatarPrompt() {
             value={motivation}
             onChange={e => setMotivation(e.target.value)}
             placeholder="Motivação"
-            className="flex-1 bg-zinc-900 border border-zinc-800 rounded p-3 resize-none"
+            className="flex-1 bg-zinc-900 border border-zinc-800 rounded p-3 text-base"
           />
            <button
                 onClick={handleSuggestMotivation}
@@ -1030,7 +1034,7 @@ function handleCopyAvatarPrompt() {
       </section>
 
       {/* AVATAR */}
-      <section className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+      <section className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 md:p-6">
         <h2 className="text-zinc-300 mb-4">Avatar</h2>
 
         {!isCropping && (

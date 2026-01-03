@@ -144,6 +144,8 @@ useEffect(() => {
   };
 }, [campaignId, user]);
 
+
+
   // ===============================
   // UPDATE CHARACTER
   // ===============================
@@ -325,8 +327,15 @@ async function finishCreation() {
   const safeRemaining = character.remainingPoints ?? 27;
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex justify-center px-4 py-10 overflow-y-auto">
-      <div className="w-full max-w-4xl bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-6 max-h-[90vh] overflow-y-auto">
+  <div className="min-h-screen bg-zinc-950 flex flex-col">
+    {/* CONTEÚDO COM SCROLL */}
+    <div
+          className="overflow-y-auto px-4 pt-6 pb-40 md:pb-24"
+          style={{ height: "calc(100vh - 80px)" }}
+        >
+
+      <div className="w-full max-w-4xl mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-4 md:p-6 space-y-6">
+
 
         {step === 1 && (
           <Step1Essence
@@ -349,6 +358,8 @@ async function finishCreation() {
     onUpdate={updateCharacterData}   // ✅ ADICIONADO
     onBack={() => goToStep(1)}
     onNext={() => goToStep(3)}
+    onValidityChange={setIsStepValid}
+
           />
         )}
 
@@ -361,28 +372,37 @@ async function finishCreation() {
           />
         )}
 
-          <div className="flex justify-between pt-4 border-t border-zinc-800">
-            <button
-              onClick={() => {
-                if (step === 1) {
-                  onCancel();      // 🔙 Volta para CharacterList
-                } else {
-                  prevStep();      // 🔙 Volta para o step anterior
-                }
-              }}
-              className="px-4 py-2 text-zinc-300 hover:text-white"
-            >
-              Voltar
-            </button>
+          {/* FOOTER FIXO */}
+           <div className="flex justify-between pt-4 border-t border-zinc-800">
+              {/* VOLTAR — sempre existe */}
+              <button
+                onClick={() => {
+                  if (step === 1) {
+                    onCancel(); // volta para CharacterList
+                  } else {
+                    prevStep();
+                  }
+                }}
+                className="px-4 py-2 text-zinc-300 hover:text-white"
+              >
+                Voltar
+              </button>
 
-            <button
-              onClick={nextStep}
-              disabled={!isStepValid}
-              className="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-zinc-900 font-semibold rounded-lg disabled:opacity-40"
-            >
-              Seguinte
-            </button>
-          </div>
+              {/* SEGUINTE — só nos steps 1 e 2 */}
+              {step !== 3 && (
+                <button
+                  onClick={nextStep}
+                  disabled={!isStepValid}
+                  className="px-6 py-2 bg-amber-500 hover:bg-amber-600
+                            text-zinc-900 font-semibold rounded-lg
+                            disabled:opacity-40"
+                >
+                  Seguinte
+                </button>
+              )}
+            </div>
+
+
 
 
       </div>
@@ -443,6 +463,7 @@ async function finishCreation() {
           )}
 
 
+    </div>
     </div>
   );
 }

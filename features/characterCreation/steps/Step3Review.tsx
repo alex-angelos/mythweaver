@@ -259,21 +259,30 @@ export default function Step3Review({
     }
   };
 
+  useEffect(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}, []);
+
+
+
+
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="space-y-8 pb-32">
 
       {/* PROGRESS */}
-      <div className="flex items-center gap-2 mb-8">
-        <div className="h-1.5 w-24 bg-amber-500 rounded-full" />
-        <div className="h-1.5 w-24 bg-amber-500 rounded-full" />
-        <div className="h-1.5 w-24 bg-amber-500 rounded-full" />
+      <div className="flex gap-2 md:gap-3">
+        <div className="h-1.5 w-full bg-amber-500 rounded-full" />
+        <div className="h-1.5 w-full bg-amber-500 rounded-full" />
+        <div className="h-1.5 w-full bg-amber-500 rounded-full" />
       </div>
 
-      <h1 className="text-amber-400 mb-2">
+
+      <h1 className="text-xl md:text-2xl text-amber-400 mb-1">
+
         Revisão Final
       </h1>
-      <p className="text-zinc-400 mb-12">
+      <p className="text-sm md:text-base text-zinc-400 mb-6">
         Confirme os detalhes do seu personagem antes de começar
       </p>
 
@@ -281,13 +290,13 @@ export default function Step3Review({
 
         {/* AVATAR */}
         <section className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-          <header className="px-6 py-4 bg-zinc-800/50 border-b border-zinc-800">
+          <header className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
             <h2 className="text-zinc-300">
               Avatar do Personagem
             </h2>
           </header>
 
-          <div className="p-6 flex flex-col items-center gap-4">
+          <div className="p-4 md:p-6 flex flex-col items-center gap-4">
             <div className="w-36 h-36 rounded-full overflow-hidden border-2 border-amber-500 bg-zinc-800">
               <img
                 src={avatarUrl || avatarPadrao}
@@ -320,7 +329,7 @@ export default function Step3Review({
             </button>
           </header>
 
-          <div className="p-6 space-y-4">
+          <div className="p-4 md:p-6 space-y-4">
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <span className="text-zinc-500 text-sm">Nome</span>
@@ -363,7 +372,7 @@ export default function Step3Review({
             </h2>
           </header>
 
-          <div className="p-6 text-zinc-300 text-sm leading-relaxed">
+          <div className="p-4 md:p-6 text-zinc-300 text-sm leading-relaxed">
             {backgroundDescription}
           </div>
         </section>
@@ -381,7 +390,7 @@ export default function Step3Review({
             </button>
           </header>
 
-          <div className="p-6 grid grid-cols-3 gap-4">
+          <div className="p-4 md:p-6 grid grid-cols-2 md:grid-cols-3 gap-4">
             {Object.entries(attributes as Record<string, number>).map(
               ([key, value]) => (
                 <div
@@ -412,7 +421,7 @@ export default function Step3Review({
             </h2>
           </header>
 
-          <div className="p-6 flex flex-wrap gap-2">
+          <div className="p-4 md:p-6 flex flex-wrap gap-2">
             {skills.length > 0 ? (
               skills.map(skill => (
                 <span
@@ -439,7 +448,7 @@ export default function Step3Review({
             </h2>
           </header>
 
-          <div className="p-6 space-y-4">
+          <div className="p-4 md:p-6 space-y-4">
             <ul className="list-disc list-inside text-zinc-200">
               {equipment.map(item => (
                 <li key={item}>{item}</li>
@@ -457,10 +466,10 @@ export default function Step3Review({
       </div>
 
       {/* CTA FINAL */}
-      <div className="flex justify-center pt-8 border-t border-zinc-800">
-        <button
+      <div className="pt-6 border-t border-zinc-800">
+  <button
+    className="w-full md:w-auto px-8 py-4 bg-amber-600 hover:bg-amber-500 text-zinc-950 rounded transition-colors text-lg"
           onClick={handleConfirm}
-          className="px-12 py-4 bg-amber-600 hover:bg-amber-500 text-zinc-950 rounded transition-colors text-lg"
         >
           Criar Personagem
         </button>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Sparkles,
   ChevronDown,
@@ -237,6 +238,7 @@ type Props = {
   onUpdate: (partial: any) => void;
   onNext: () => void;
   onBack: () => void;
+  onValidityChange: (valid: boolean) => void;
 };
 
 /* ===============================
@@ -280,8 +282,7 @@ const Step2Gameplay: React.FC<Props> = ({
   onDecrease,
   onSuggest,
   onUpdate,
-  onNext,
-  onBack
+  onValidityChange
 }) => {
   const [showExplanation, setShowExplanation] = React.useState(false);
 
@@ -334,6 +335,12 @@ const automaticSkills = React.useMemo(
     });
   }
 
+  useEffect(() => {
+  const valid = remainingPoints === 0;
+  onValidityChange(valid);
+}, [remainingPoints, onValidityChange]);
+
+
 
 
   // 🔄 Persistência FINAL (Step 3)
@@ -354,27 +361,31 @@ const automaticSkills = React.useMemo(
 
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10 space-y-10">
+    <div className="space-y-8 pb-32">
+
+
 
       {/* PROGRESS */}
-      <div className="flex gap-2">
-        <div className="h-1.5 w-24 bg-zinc-800 rounded-full" />
-        <div className="h-1.5 w-24 bg-amber-500 rounded-full" />
-        <div className="h-1.5 w-24 bg-zinc-800 rounded-full" />
+      <div className="flex gap-2 md:gap-3">
+        <div className="h-1.5 w-full bg-zinc-800 rounded-full" />
+        <div className="h-1.5 w-full bg-amber-500 rounded-full" />
+        <div className="h-1.5 w-full bg-zinc-800 rounded-full" />
       </div>
+
 
       {/* HEADER */}
       <header className="space-y-2">
-        <h2 className="text-2xl font-semibold text-amber-400">
+        <h2 className="text-xl md:text-2xl font-semibold text-amber-400">
           Atributos do Personagem
         </h2>
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm md:text-base text-zinc-400">
           Distribua os pontos que definem as capacidades do seu personagem.
         </p>
       </header>
 
       {/* POINTS */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-5
+ space-y-3">
         <div className="flex justify-between items-center">
           <span className="text-sm text-zinc-400">
             Pontos disponíveis
@@ -419,7 +430,8 @@ const automaticSkills = React.useMemo(
         {(Object.keys(attributes) as (keyof Attributes)[]).map(key => (
           <div
             key={key}
-            className="bg-zinc-900 border border-zinc-800 rounded-xl p-5"
+            className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-5
+"
           >
             <div className="flex justify-between">
               <div className="flex items-center gap-2 text-zinc-200">
@@ -432,9 +444,13 @@ const automaticSkills = React.useMemo(
             </div>
 
             <div className="flex justify-between items-center mt-4">
-              <button onClick={() => onDecrease(key)}>
-                <Minus />
-              </button>
+             <button
+                  onClick={() => onDecrease(key)}
+                  className="h-10 w-10 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+
               <span className="text-xl text-amber-400">
                 {attributes[key]}
               </span>
@@ -547,24 +563,7 @@ const automaticSkills = React.useMemo(
           )}
         </div>
       )}
-
-      {/* NAVIGATION */}
-      <div className="flex justify-between pt-6 border-t border-zinc-800">
-        <button
-          onClick={onBack}
-          className="px-4 py-2 text-zinc-300 hover:text-zinc-100"
-        >
-          Voltar
-        </button>
-        <button
-          onClick={onNext}
-          disabled={remainingPoints !== 0}
-          className="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-zinc-900 font-semibold rounded-lg disabled:opacity-40"
-        >
-          Seguinte
-        </button>
       </div>
-    </div>
   );
 };
 
