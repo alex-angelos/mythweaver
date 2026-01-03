@@ -93,15 +93,27 @@ export default function CharacterList({
   return (
     <div className="min-h-screen bg-zinc-950 flex flex-col">
 
-      {/* HEADER */}
-      <div className="px-4 pt-6 pb-4 md:px-6 md:pt-10">
-        <h1 className="text-amber-400 text-xl md:text-2xl mb-1">
-          Seus Personagens
-        </h1>
-        <p className="text-zinc-400 text-sm md:text-base">
-          Escolha um personagem para continuar sua jornada
-        </p>
-      </div>
+     {/* HEADER */}
+        <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-amber-400 mb-1">
+              Seus Personagens
+            </h1>
+            <p className="text-zinc-400 text-sm">
+              Escolha um personagem para continuar sua jornada
+            </p>
+          </div>
+
+          <button
+            onClick={onCreate}
+            className="px-4 py-2 bg-amber-600 hover:bg-amber-500
+                      text-zinc-950 rounded font-medium
+                      w-full sm:w-auto"
+          >
+            + Novo Personagem
+          </button>
+        </div>
+
 
       {/* LIST */}
       <div className="flex-1 px-4 md:px-6 pb-28 md:pb-12 space-y-4 max-w-5xl mx-auto w-full">
@@ -181,17 +193,6 @@ export default function CharacterList({
             </div>
           );
         })}
-      </div>
-
-      {/* CREATE BUTTON — MOBILE FIXED */}
-      <div className="fixed bottom-4 left-4 right-4 md:hidden z-50">
-        <button
-          onClick={onCreate}
-          className="w-full h-12 bg-amber-600 hover:bg-amber-500 text-zinc-950 rounded-lg flex items-center justify-center gap-2 font-medium"
-        >
-          <Plus className="w-4 h-4" />
-          Novo Personagem
-        </button>
       </div>
 
     </div>
