@@ -62,7 +62,7 @@ export default function CharacterList({
 
   if (safeCharacters.length === 0) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center px-6 text-center">
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center px-6 text-center max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="w-24 h-24 bg-zinc-900 border-2 border-zinc-800 rounded-full flex items-center justify-center mb-6">
           <User className="w-12 h-12 text-zinc-700" />
         </div>
@@ -91,7 +91,8 @@ export default function CharacterList({
   =============================== */
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col">
+    <div className="bg-zinc-950 min-h-screen overflow-y-auto">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
      {/* HEADER */}
         <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -194,7 +195,7 @@ export default function CharacterList({
           );
         })}
       </div>
-
+        </div>
     </div>
   );
 }

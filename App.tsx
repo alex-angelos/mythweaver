@@ -158,7 +158,7 @@ export default function App() {
       {/* =============================
          📜 CONTEÚDO PRINCIPAL
       ============================== */}
-      <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
+      <main className="flex-1 flex flex-col min-h-0 overflow-y-auto">
         {/* Header (fora do jogo) */}
         {!isInGame && !isCreating && (
           <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
@@ -187,7 +187,7 @@ export default function App() {
         )}
 
         {/* Conteúdo */}
-        <div className="flex-1 overflow-hidden min-h-0">
+        <div className="flex-1 overflow-y-auto min-h-0">
           {isCreating ? (
             <CharacterCreation
               campaignId={campaignId}
