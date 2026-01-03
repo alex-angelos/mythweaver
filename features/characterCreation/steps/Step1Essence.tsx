@@ -504,62 +504,186 @@ async function handleSuggestName() {
 
 
   /* ===============================
-     CROP STATE
-  =============================== */
+   CROP STATE
+=============================== */
 
-  const [rawImage, setRawImage] = useState<string | null>(null);
-  const [isCropping, setIsCropping] = useState(false);
-  const [zoom, setZoom] = useState(1);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+const [rawImage, setRawImage] = useState<string | null>(null);
+const [isCropping, setIsCropping] = useState(false);
+const [zoom, setZoom] = useState(1);
+const [offset, setOffset] = useState({ x: 0, y: 0 });
 
-  const lastTouchDistance = useRef<number | null>(null);
-  const isDragging = useRef(false);
-  const lastPos = useRef({ x: 0, y: 0 });
+const lastTouchDistance = useRef<number | null>(null);
+const isDragging = useRef(false);
+const lastPos = useRef({ x: 0, y: 0 });
 
-  const imgRef = useRef<HTMLImageElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+const imgRef = useRef<HTMLImageElement | null>(null);
+const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  /* ===============================
-     CANVAS DRAW
-  =============================== */
+/* ===============================
+   UTILS
+=============================== */
 
-  function drawCanvas() {
-    if (!canvasRef.current || !imgRef.current) return;
-    const ctx = canvasRef.current.getContext("2d");
-    if (!ctx) return;
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
+}
 
-    const size = 256;
-    canvasRef.current.width = size;
-    canvasRef.current.height = size;
+/* ===============================
+   CANVAS DRAW
+=============================== */
 
-    ctx.clearRect(0, 0, size, size);
+function drawCanvas() {
+  if (!canvasRef.current || !imgRef.current) return;
+  const ctx = canvasRef.current.getContext("2d");
+  if (!ctx) return;
 
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
-    ctx.clip();
+  const size = 256;
+  canvasRef.current.width = size;
+  canvasRef.current.height = size;
 
-    ctx.translate(size / 2 + offset.x, size / 2 + offset.y);
-    ctx.scale(zoom, zoom);
+  ctx.clearRect(0, 0, size, size);
 
-    ctx.drawImage(
-      imgRef.current,
-      -imgRef.current.width / 2,
-      -imgRef.current.height / 2
-    );
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+  ctx.clip();
 
-    ctx.restore();
+  ctx.translate(size / 2 + offset.x, size / 2 + offset.y);
+  ctx.scale(zoom, zoom);
+
+  ctx.drawImage(
+    imgRef.current,
+    -imgRef.current.width / 2,
+    -imgRef.current.height / 2
+  );
+
+  ctx.restore();
+}
+
+useEffect(() => {
+  drawCanvas();
+}, [zoom, offset, rawImage]);
+
+/* ===============================
+   RESET AO ABRIR NOVO CROP
+=============================== */
+
+useEffect(() => {
+  if (!rawImage) return;
+
+  setZoom(1);
+  setOffset({ x: 0, y: 0 });
+  lastTouchDistance.current = null;
+}, [rawImage]);
+
+/* ===============================
+   AJUSTE DE OFFSET AO ZOOM
+=============================== */
+
+useEffect(() => {
+  if (!imgRef.current) return;
+
+  const img = imgRef.current;
+  const size = 256;
+
+  const maxOffsetX = Math.max(0, (img.width * zoom - size) / 2);
+  const maxOffsetY = Math.max(0, (img.height * zoom - size) / 2);
+
+  setOffset(o => ({
+    x: clamp(o.x, -maxOffsetX, maxOffsetX),
+    y: clamp(o.y, -maxOffsetY, maxOffsetY)
+  }));
+}, [zoom]);
+
+/* ===============================
+   POINTER HANDLERS
+=============================== */
+
+function onPointerDown(x: number, y: number) {
+  isDragging.current = true;
+  lastPos.current = { x, y };
+}
+
+function onPointerMove(x: number, y: number) {
+  if (!isDragging.current || !imgRef.current) return;
+
+  const dx = x - lastPos.current.x;
+  const dy = y - lastPos.current.y;
+
+  const img = imgRef.current;
+  const size = 256;
+
+  const maxOffsetX = Math.max(0, (img.width * zoom - size) / 2);
+  const maxOffsetY = Math.max(0, (img.height * zoom - size) / 2);
+
+  setOffset(o => ({
+    x: clamp(o.x + dx, -maxOffsetX, maxOffsetX),
+    y: clamp(o.y + dy, -maxOffsetY, maxOffsetY)
+  }));
+
+  lastPos.current = { x, y };
+}
+
+function onPointerUp() {
+  isDragging.current = false;
+  lastTouchDistance.current = null;
+}
+
+/* ===============================
+   GLOBAL LISTENERS
+=============================== */
+
+useEffect(() => {
+  function handleMouseMove(e: MouseEvent) {
+    onPointerMove(e.clientX, e.clientY);
   }
 
-  useEffect(() => {
-    drawCanvas();
-  }, [zoom, offset, rawImage]);
+  function handleMouseUp() {
+    onPointerUp();
+  }
+
+  function handleTouchMove(e: TouchEvent) {
+    if (e.touches.length === 1) {
+      onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (lastTouchDistance.current !== null) {
+        setZoom(z =>
+          clamp(z + (dist - lastTouchDistance.current) / 200, 0.5, 2)
+        );
+      }
+
+      lastTouchDistance.current = dist;
+    }
+  }
+
+  function handleTouchEnd() {
+    onPointerUp();
+  }
+
+  window.addEventListener("mousemove", handleMouseMove);
+  window.addEventListener("mouseup", handleMouseUp);
+  window.addEventListener("touchmove", handleTouchMove, { passive: false });
+  window.addEventListener("touchend", handleTouchEnd);
+
+  return () => {
+    window.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener("mouseup", handleMouseUp);
+    window.removeEventListener("touchmove", handleTouchMove);
+    window.removeEventListener("touchend", handleTouchEnd);
+  };
+}, []);
+
 
   /* ===============================
-     CROP ACTIONS
+     RENDER
   =============================== */
 
-function applyCrop() {
+  function applyCrop() {
   if (!canvasRef.current) return;
 
   const croppedImage = canvasRef.current.toDataURL("image/png");
@@ -575,23 +699,21 @@ function applyCrop() {
   });
 }
 
+function resetAvatar() {
+  setAvatarImage(null);
+  setRawImage(null);
+  setIsCropping(false);
+  setZoom(1);
+  setOffset({ x: 0, y: 0 });
 
-  function resetAvatar() {
-    setAvatarImage(null);
-    setRawImage(null);
-    setIsCropping(false);
-    setZoom(1);
-    setOffset({ x: 0, y: 0 });
-
-    onUpdate({
+  onUpdate({
     avatar: null
-      });
-  }
+  });
+}
 
 function handleCopyAvatarPrompt() {
   if (!avatarPrompt) return;
 
-  // Clipboard moderno (HTTPS)
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(avatarPrompt).then(() => {
       setCopiedPrompt(true);
@@ -600,7 +722,6 @@ function handleCopyAvatarPrompt() {
     return;
   }
 
-  // Fallback (dev / ambientes inseguros)
   const textarea = document.createElement("textarea");
   textarea.value = avatarPrompt;
   textarea.style.position = "fixed";
@@ -613,78 +734,11 @@ function handleCopyAvatarPrompt() {
     document.execCommand("copy");
     setCopiedPrompt(true);
     setTimeout(() => setCopiedPrompt(false), 1500);
-  } catch (err) {
-    console.error("Falha ao copiar prompt", err);
   } finally {
     document.body.removeChild(textarea);
   }
 }
 
-
-
-  /* ===============================
-     POINTER HANDLERS
-  =============================== */
-
-  function onPointerDown(x: number, y: number) {
-    isDragging.current = true;
-    lastPos.current = { x, y };
-  }
-
-  function onPointerMove(x: number, y: number) {
-    if (!isDragging.current) return;
-    setOffset(o => ({ x: o.x + (x - lastPos.current.x), y: o.y + (y - lastPos.current.y) }));
-    lastPos.current = { x, y };
-  }
-
-  function onPointerUp() {
-    isDragging.current = false;
-    lastTouchDistance.current = null;
-  }
-
-  useEffect(() => {
-    function handleMouseMove(e: MouseEvent) {
-      onPointerMove(e.clientX, e.clientY);
-    }
-    function handleMouseUp() {
-      onPointerUp();
-    }
-    function handleTouchMove(e: TouchEvent) {
-      if (e.touches.length === 1) {
-        onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
-      }
-      if (e.touches.length === 2) {
-        const dx = e.touches[0].clientX - e.touches[1].clientX;
-        const dy = e.touches[0].clientY - e.touches[1].clientY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (lastTouchDistance.current !== null) {
-          setZoom(z =>
-            Math.min(2, Math.max(0.5, z + (dist - lastTouchDistance.current!) / 200))
-          );
-        }
-        lastTouchDistance.current = dist;
-      }
-    }
-    function handleTouchEnd() {
-      onPointerUp();
-    }
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
-    window.addEventListener("touchend", handleTouchEnd);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, []);
-
-  /* ===============================
-     RENDER
-  =============================== */
 
 
 
