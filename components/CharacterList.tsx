@@ -26,7 +26,7 @@ type Props = {
   onSelect: (id: string) => void;
   onCopy: (id: string) => void;
   onDelete: (id: string) => void;
-  onCreateNew: () => void;
+  onCreate: () => void;
 };
 
 /* ===============================
@@ -39,7 +39,7 @@ export default function CharacterList({
   onSelect,
   onCopy,
   onDelete,
-  onCreateNew
+  onCreate
 }: Props) {
   // 🔒 BLINDAGEM ABSOLUTA
   const safeCharacters: Character[] = Array.isArray(characters)
@@ -78,7 +78,7 @@ export default function CharacterList({
         </p>
 
         <button
-          onClick={onCreateNew}
+          onClick={onCreate} /* ✅ CORRIGIDO */
           className="px-8 py-3 bg-amber-600 hover:bg-amber-500 text-zinc-950 rounded transition-colors flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
@@ -109,10 +109,9 @@ export default function CharacterList({
         {/* CREATE BUTTON */}
         <div className="flex justify-end mb-6">
           <button
-            onClick={onCreateNew}
-            className="px-6 py-2.5 bg-amber-600 hover:bg-amber-500 text-zinc-950 rounded transition-colors flex items-center gap-2 text-sm"
+            onClick={onCreate}
+            className="px-3 py-1 bg-amber-600 text-black rounded hover:bg-amber-500"
           >
-            <Plus className="w-4 h-4" />
             Novo Personagem
           </button>
         </div>
@@ -203,6 +202,7 @@ export default function CharacterList({
             );
           })}
         </div>
+
       </div>
     </div>
   );

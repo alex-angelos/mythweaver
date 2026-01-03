@@ -3,16 +3,21 @@ import CharacterCreationWizard from "../features/characterCreation/CharacterCrea
 interface Props {
   campaignId: string;
   onCreated: () => void;
+  onCancel: () => void; // ✅ ADICIONAR
 }
+
 
 export default function CharacterCreation({
   campaignId,
-  onCreated
+  onCreated,
+  onCancel
 }: Props) {
   return (
     <CharacterCreationWizard
-      campaignId={campaignId}
-      onCreated={onCreated}
-    />
+  campaignId={campaignId}
+  onCreated={onCreated}
+  onCancel={onCancel} // ✅ PASSA ADIANTE
+/>  
+
   );
 }

@@ -26,7 +26,7 @@ export type Character = {
 export default function App() {
   const [campaignId] = useState("main_campaign");
 
-  const [characters, setCharacters] = useState<Character[]>([]); // ✅ blindagem inicial
+  const [characters, setCharacters] = useState<Character[]>([]);
   const [selectedCharacterId, setSelectedCharacterId] =
     useState<string | null>(null);
 
@@ -139,7 +139,6 @@ export default function App() {
               md:translate-x-0
             `}
           >
-            {/* ✅ Blindagem para evitar map() em undefined */}
             <Sidebar
               character={{
                 ...selectedCharacter,
@@ -166,13 +165,6 @@ export default function App() {
             <h1 className="text-xl font-semibold tracking-wide">
               Mythweaver
             </h1>
-
-            <button
-              onClick={() => setIsCreating(true)}
-              className="px-3 py-1 bg-amber-600 text-black rounded hover:bg-amber-500"
-            >
-              Novo Personagem
-            </button>
           </header>
         )}
 
@@ -203,6 +195,7 @@ export default function App() {
                 setIsCreating(false);
                 loadCharacters();
               }}
+              onCancel={() => setIsCreating(false)} // 👈 volta para CharacterList
             />
           ) : isInGame && selectedCharacter ? (
             <GameChat
@@ -215,11 +208,12 @@ export default function App() {
             />
           ) : (
             <CharacterList
-              characters={Array.isArray(characters) ? characters : []}
+              characters={characters}
               loading={loadingCharacters}
               onSelect={id => setSelectedCharacterId(id)}
               onDelete={deleteCharacter}
               onCopy={copyCharacter}
+              onCreate={() => setIsCreating(true)} // ✅ ÚNICO ponto de criação
             />
           )}
         </div>

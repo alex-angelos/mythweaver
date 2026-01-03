@@ -20,7 +20,9 @@ type WizardStep = 1 | 2 | 3;
 interface Props {
   campaignId: string;
   onCreated: () => void;
+  onCancel: () => void; // ✅ ADICIONAR
 }
+
 
 type Attributes = {
   strength: number;
@@ -61,7 +63,7 @@ const emptyCharacterDraft: any = {
 /* ===============================
    COMPONENT
 =============================== */
-export default function CharacterCreationWizard({ campaignId, onCreated }: Props) {
+export default function CharacterCreationWizard({ campaignId, onCreated, onCancel }: Props) {
   const { user: authUser } = useAuth();
   const [user, setUser] = useState(authUser);
   const [step, setStep] = useState<WizardStep>(1);
@@ -359,15 +361,20 @@ async function finishCreation() {
           />
         )}
 
-            {step < 3 && step !== 2 && (
           <div className="flex justify-between pt-4 border-t border-zinc-800">
             <button
-              onClick={prevStep}
-              disabled={step === 1}
-              className="px-4 py-2 text-zinc-300 disabled:opacity-40"
+              onClick={() => {
+                if (step === 1) {
+                  onCancel();      // 🔙 Volta para CharacterList
+                } else {
+                  prevStep();      // 🔙 Volta para o step anterior
+                }
+              }}
+              className="px-4 py-2 text-zinc-300 hover:text-white"
             >
               Voltar
             </button>
+
             <button
               onClick={nextStep}
               disabled={!isStepValid}
@@ -376,7 +383,7 @@ async function finishCreation() {
               Seguinte
             </button>
           </div>
-        )}
+
 
       </div>
           
